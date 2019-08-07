@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -41,10 +42,14 @@ uint8_t *load_image(const char *path, int *width, int *height);
 /* implementation */
 int main(int argc, char** argv) {
   pname = argv[0];
-  if (argc == 2) {
+  int quality;
+  if (argc == 3) quality = atoi(argv[2]);
+  else  quality = 93;
+  if (argc == 2 || argc == 3)
+  {
     int w, h;
     uint8_t *img = load_image(argv[1], &w, &h);
-    jpec_enc_t *e = jpec_enc_new(img, w, h);
+    jpec_enc_t *e = jpec_enc_new2(img, w, h, quality);
     int len;
     const uint8_t *jpeg = jpec_enc_run(e, &len);
     FILE *file = fopen("result.jpg", "wb");
@@ -54,9 +59,10 @@ int main(int argc, char** argv) {
     jpec_enc_del(e);
     free(img);
   }
-  else {
+  else
+  {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  %s /path/to/img\n", pname);
+    fprintf(stderr, "  %s /path/to/img [quality]\n", pname);
     exit(1);
   }
   return 0;
